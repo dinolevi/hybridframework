@@ -1,10 +1,13 @@
 package ui;
 
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.util.List;
 
 public class UiHelpers {
 
@@ -18,9 +21,10 @@ public class UiHelpers {
     }
 
 
-    public WebElement waitElement(WebElement element){
+    public WebElement waitToBeClickable(WebElement element){
         return  wait.until(ExpectedConditions.elementToBeClickable(element));
     }
+
 
 
 }

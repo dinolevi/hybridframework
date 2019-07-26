@@ -18,31 +18,32 @@ public class DriversTest extends BaseUiTest{
     @Test
     public void chrome() throws InterruptedException {
 
-        setup(CHROME_DRIVER);
+
 
         driver.get("http://www.google.com/xhtml");
        // driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
        // Thread.sleep(5000);  // Let the user actually see something!
 
        driver.getTitle().contentEquals("Google");
-        page.search().sendKeys("YYYYYYYY");
+        //page.search().sendKeys("YYYYYYYY");
         Thread.sleep(5000);  // Let the user actually see something!
         driver.quit();
 
     }
 
-//    @Test
-//    public void firefox() throws InterruptedException {
-//
-//        System.setProperty("webdriver.gecko.driver","src/test/resources/drivers/geckodriver.exe");
-//
-//        WebDriver driver = new FirefoxDriver();
-//
-//        driver.get("https://www.softwaretestingmaterial.com/software-testing-interview-questions-free-ebook/");
-//
-//        System.out.println("Selenium Webdriver Script in Firefox browser using Gecko Driver | Software Testing Material");
-//
-//        driver.close();
-//
-//    }
+    @Test
+    public void firefox() throws InterruptedException {
+
+//        System.setProperty("webdriver.gecko.driver",
+//                "src/test/resources/drivers/geckodriver.exe");
+//       WebDriver driver = new FirefoxDriver();
+        Thread.sleep(3000);
+
+        driver.get("https://www.nba.com");
+
+        System.out.println("Selenium Webdriver Script in Firefox browser using Gecko Driver | Software Testing Material");
+
+        driver.close();
+
+    }
 }
