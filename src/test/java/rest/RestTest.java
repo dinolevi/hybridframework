@@ -5,9 +5,13 @@ import io.restassured.response.Response;
 
 import static org.hamcrest.MatcherAssert.*;
 
+import javafx.scene.layout.Priority;
+import org.hamcrest.Matchers;
+import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import rest.body.CreatePersonBody;
+import rest.body.UpdatePerson;
 import rest.requests.HelperRest;
 import rest.requests.People;
 import rest.requests.Seniorities;
@@ -16,9 +20,7 @@ import rest.response.PersonResponse;
 import rest.response.SeniorityResponse;
 import rest.response.TechnologyResponse;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Random;
+import java.util.*;
 
 import static org.hamcrest.core.Is.is;
 
@@ -38,7 +40,7 @@ public class RestTest {
         sessionToken = HelperRest.sessionToken;
     }
 
-    @Test public void CreatePerson() {
+    @Test(priority = 1) public void CreatePerson() {
         //Create random seniority
         LinkedHashMap<String, String> randomSeniority = new LinkedHashMap<String, String>();
         randomSeniority
@@ -98,6 +100,93 @@ public class RestTest {
                 createPersonObj.getTechnologies().get(0).getTechnologyId(),
                 is(createTechnologyObj.getTechnologyId()));
 
+    }
+
+    @Test(priority = 2) public void firstLastNameConversion() {
+        //Get all people and put it in the list
+        Response getPeopleResponse = people.getPeople(uri, sessionToken);
+
+        PersonResponse[] getPeopleArray = gson
+                .fromJson(getPeopleResponse.asString(), PersonResponse[].class);
+
+        ArrayList<PersonResponse> peopleArrayList = new ArrayList<>(
+                Arrays.asList(getPeopleArray));
+
+        for (PersonResponse person : peopleArrayList){
+            System.out.println("\nBEFORE CONVERTION"+ person.getPeopleName());
+        }
+
+        //Swap first and last name
+        ArrayList<String> convertedFullNames = HelperRest
+                .converteListOfNames(peopleArrayList);
+
+        for(int i = 0; i<convertedFullNames.size(); i++){
+            System.out.println("\nAFTER CONVERSION" + convertedFullNames.get(i));
+        }
+
+        //Set converted names to all people
+        for (int i = 0; i < convertedFullNames.size(); i++) {
+            peopleArrayList.get(i).setPeopleName(convertedFullNames.get(i));
+
+        }
+
+        //Send update to all
+        for (int i = 0; i < peopleArrayList.size(); i++) {
+            UpdatePerson updatePersonBody = new UpdatePerson();
+            updatePersonBody
+                    .setPeopleName(peopleArrayList.get(i).getPeopleName());
+            updatePersonBody.setSeniorityId(
+                    peopleArrayList.get(i).getSeniority().getSeniorityId());
+
+            updatePersonBody.getTechnologies()
+                    .add(peopleArrayList.get(i).getTechnologies().get(0)
+                            .getTechnologyId());
+
+            Response update = people
+                    .updatePerson(updatePersonBody, uri, sessionToken,
+                            peopleArrayList.get(i).getPeopleId().toString());
+
+        }
+    }
+
+//    @Test(priority = 3) public void deleteAll() {
+//        Response getPeopleResponse = people.getPeople(uri, sessionToken);
+//
+//        PersonResponse[] getPeopleArray = gson
+//                .fromJson(getPeopleResponse.asString(), PersonResponse[].class);
+//        ArrayList<PersonResponse> peopleArrayList = new ArrayList<>(
+//                Arrays.asList(getPeopleArray));
+//        ArrayList<Integer> getAllPersonIds = new ArrayList<>();
+//
+//        for (PersonResponse person : peopleArrayList) {
+//            getAllPersonIds.add(person.getPeopleId());
+//        }
+//
+//        for (int i = 0; i <= getAllPersonIds.size() - 1; i++) {
+//            Response response = people.deletePeople(uri, sessionToken,
+//                    getAllPersonIds.get(i).toString());
+//        }
+//
+//        String emptyPeopleResponse = people.getPeople(uri, sessionToken).body()
+//                .asString();
+//        assertThat("There is no users ", emptyPeopleResponse, is("{}"));
+//
+//    }
+
+    @Test public void converterTest() {
+        ArrayList<String> list = new ArrayList<>();
+        list.add("RAMBO MAMBO");
+        list.add("CAKA NOSRIS");
+        list.add("PERA ZDERA");
+
+        ArrayList<String> converted = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            converted.add(HelperRest.convertName(list.get(i)));
+        }
+
+        for (String i : converted){
+            System.out.println(i);
+        }
     }
 
 }
