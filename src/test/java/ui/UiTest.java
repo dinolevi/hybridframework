@@ -2,12 +2,13 @@ package ui;
 
 import org.testng.annotations.Test;
 
-public class UiTest extends BaseUiTest{
+/**
+ * Class prepared for writing UI tests
+ */
+public class UiTest extends BaseUiTest {
 
-  @Test
-  public void createUsers(){
+    @Test public void createUsers() {
 
-  }
-
+    }
 
 }

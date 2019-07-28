@@ -7,9 +7,24 @@ import io.restassured.specification.RequestSpecification;
 
 import java.util.LinkedHashMap;
 
+/**
+ * Class contains requests for contacting Technologies API
+ *
+ * @author dino
+ */
 public class Technologies {
 
-    public Response createTechnology(LinkedHashMap<String, String> body, String uri, String sessionToken){
+    /**
+     * Request will send request for creating technology when all parameters are inserted
+     *
+     * @param body         prepared body of requests
+     * @param uri          base url
+     * @param sessionToken session token
+     * @return return response which can be used for assertions
+     * @author: dino
+     */
+    public Response createTechnology(LinkedHashMap<String, String> body,
+            String uri, String sessionToken) {
         Gson gson = new Gson();
         String jsonBody = gson.toJson(body);
 

@@ -7,9 +7,24 @@ import io.restassured.specification.RequestSpecification;
 
 import java.util.LinkedHashMap;
 
+/**
+ * Class contains requests for contacting Seniorities API
+ *
+ * @author dino
+ */
 public class Seniorities {
 
-    public Response createSeniority(LinkedHashMap<String, String> body, String uri, String sessionToken){
+    /**
+     * Request will send request for creating seniority when all parameters are inserted
+     *
+     * @param body         prepared body of requests
+     * @param uri          base url
+     * @param sessionToken session token
+     * @return return response which can be used for assertions
+     * @author: dino
+     */
+    public Response createSeniority(LinkedHashMap<String, String> body,
+            String uri, String sessionToken) {
         Gson gson = new Gson();
         String jsonBody = gson.toJson(body);
 

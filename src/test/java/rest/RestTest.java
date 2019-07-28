@@ -2,12 +2,10 @@ package rest;
 
 import com.google.gson.Gson;
 import io.restassured.response.Response;
-
-import static org.hamcrest.MatcherAssert.*;
-
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import rest.body.CreatePersonBody;
+import rest.body.UpdatePerson;
 import rest.requests.HelperRest;
 import rest.requests.People;
 import rest.requests.Seniorities;
@@ -17,11 +15,17 @@ import rest.response.SeniorityResponse;
 import rest.response.TechnologyResponse;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Random;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
+/**
+ * In this class will be tested creation, update and deletion of users, via rest assured
+ * @author: dino
+ */
 public class RestTest {
 
     private String uri = "https://qa-sandbox.apps.htec.rs";
@@ -38,7 +42,11 @@ public class RestTest {
         sessionToken = HelperRest.sessionToken;
     }
 
-    @Test public void CreatePerson() {
+    /**
+     * Test will check creation of random seniority, technology and person
+     * @author: dino
+     */
+    @Test public void createPersonTest() {
         //Create random seniority
         LinkedHashMap<String, String> randomSeniority = new LinkedHashMap<String, String>();
         randomSeniority
@@ -78,17 +86,17 @@ public class RestTest {
         technologyList.add(createTechnologyObj.getTechnologyId().intValue());
         personBody.setTechnologies(technologyList);
 
-        Response crestePersonResponse = people
+        Response createPersonResponse = people
                 .createPerson(personBody, uri, sessionToken);
         PersonResponse createPersonObj = gson
-                .fromJson(crestePersonResponse.asString(),
+                .fromJson(createPersonResponse.asString(),
                         PersonResponse.class);
 
         assertThat("Person name is the same as we pass in request",
                 createPersonObj.getPeopleName(),
                 is(personBody.getPeopleName()));
 
-        assertThat("Person sniority id is the same as " + createSeniorityObj
+        assertThat("Person seniority id is the same as " + createSeniorityObj
                         .getSeniorityTitle(),
                 createPersonObj.getSeniority().getSeniorityId(),
                 is(createSeniorityObj.getSeniorityId()));
@@ -97,6 +105,116 @@ public class RestTest {
                         .getTechnologyTitle(),
                 createPersonObj.getTechnologies().get(0).getTechnologyId(),
                 is(createTechnologyObj.getTechnologyId()));
+
+    }
+
+    /**
+     * Test will check update functionality of person and it will swap first and last name of all users
+     * @author: dino
+     */
+    @Test public void firstLastNameConversionTest() {
+        //Create user that we will check if last name and first name are switched
+        PersonResponse personBeforeConversion = HelperRest
+                .createCompleteRandomPerson();
+        String fullNameBeforeConversion = personBeforeConversion
+                .getPeopleName();
+        String firstNameBeforeConversion = fullNameBeforeConversion
+                .substring(0, fullNameBeforeConversion.indexOf(" "));
+        String lastNameBeforeConversion = fullNameBeforeConversion
+                .substring(fullNameBeforeConversion.indexOf(" "));
+
+        //Get all people and put it in the list
+        Response getPeopleResponse = people.getPeople(uri, sessionToken);
+
+        PersonResponse[] getPeopleArray = gson
+                .fromJson(getPeopleResponse.asString(), PersonResponse[].class);
+
+        ArrayList<PersonResponse> peopleArrayList = new ArrayList<>(
+                Arrays.asList(getPeopleArray));
+
+        //Swap first and last name
+        ArrayList<String> convertedFullNames = HelperRest
+                .convertListOfNames(peopleArrayList);
+
+        //Set converted names to all people
+        for (int i = 0; i < convertedFullNames.size(); i++) {
+            peopleArrayList.get(i).setPeopleName(convertedFullNames.get(i));
+
+        }
+
+        //Send update to all
+        for (int i = 0; i < peopleArrayList.size(); i++) {
+            UpdatePerson updatePersonBody = new UpdatePerson();
+            updatePersonBody
+                    .setPeopleName(peopleArrayList.get(i).getPeopleName());
+            updatePersonBody.setSeniorityId(
+                    peopleArrayList.get(i).getSeniority().getSeniorityId());
+
+            updatePersonBody.getTechnologies()
+                    .add(peopleArrayList.get(i).getTechnologies().get(0)
+                            .getTechnologyId());
+
+            people.updatePerson(updatePersonBody, uri, sessionToken,
+                    peopleArrayList.get(i).getPeopleId().toString());
+
+        }
+
+        //Check switching first an last name for the same person that we created at the beginning of test
+        Response personAfterConversionResponse = people
+                .getPersonDetails(uri, sessionToken,
+                        personBeforeConversion.getPeopleId().toString());
+
+        PersonResponse personAfterConversionObj = gson
+                .fromJson(personAfterConversionResponse.asString(),
+                        PersonResponse.class);
+
+        //Extract updated last name and first name
+        String fullNameAfterConversion = personAfterConversionObj
+                .getPeopleName();
+        String firstNameAfterConversion = fullNameAfterConversion
+                .substring(0, fullNameAfterConversion.indexOf(" "));
+        String lastNameAfterConversion = fullNameAfterConversion
+                .substring(fullNameAfterConversion.indexOf(" "));
+
+        //Check that first name and last name are switched
+        assertThat("First element in string is now second:",
+                firstNameBeforeConversion.trim(),
+                is(lastNameAfterConversion.trim()));
+        assertThat("Second element in string is now first:",
+                lastNameBeforeConversion.trim(),
+                is(firstNameAfterConversion.trim()));
+
+    }
+
+    /**
+     * Check will test deletion of all users
+     * @author: dino
+     */
+    @Test public void deleteAllTest() {
+        //Create at least one user
+        HelperRest.createCompleteRandomPerson();
+
+        //Get all users
+        Response getPeopleResponse = people.getPeople(uri, sessionToken);
+
+        PersonResponse[] getPeopleArray = gson
+                .fromJson(getPeopleResponse.asString(), PersonResponse[].class);
+        ArrayList<PersonResponse> peopleArrayList = new ArrayList<>(
+                Arrays.asList(getPeopleArray));
+        ArrayList<Integer> getAllPersonIds = new ArrayList<>();
+
+        for (PersonResponse person : peopleArrayList) {
+            getAllPersonIds.add(person.getPeopleId());
+        }
+
+        for (int i = 0; i <= getAllPersonIds.size() - 1; i++) {
+            Response response = people.deletePeople(uri, sessionToken,
+                    getAllPersonIds.get(i).toString());
+        }
+
+        String emptyPeopleResponse = people.getPeople(uri, sessionToken).body()
+                .asString();
+        assertThat("There is no users ", emptyPeopleResponse, is("{}"));
 
     }
 
