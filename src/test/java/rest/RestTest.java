@@ -24,6 +24,7 @@ import static org.hamcrest.core.Is.is;
 
 /**
  * In this class will be tested creation, update and deletion of users, via rest assured
+ *
  * @author: dino
  */
 public class RestTest {
@@ -44,6 +45,7 @@ public class RestTest {
 
     /**
      * Test will check creation of random seniority, technology and person
+     *
      * @author: dino
      */
     @Test public void createPersonTest() {
@@ -110,20 +112,24 @@ public class RestTest {
 
     /**
      * Test will check update functionality of person and it will swap first and last name of all users
+     *
      * @author: dino
      */
     @Test public void firstLastNameConversionTest() {
         //Create user that we will check if last name and first name are switched
         PersonResponse personBeforeConversion = HelperRest
                 .createCompleteRandomPerson();
-        String fullNameBeforeConversion = personBeforeConversion
-                .getPeopleName();
-        String firstNameBeforeConversion = fullNameBeforeConversion
-                .substring(0, fullNameBeforeConversion.indexOf(" "));
-        String lastNameBeforeConversion = fullNameBeforeConversion
-                .substring(fullNameBeforeConversion.indexOf(" "));
 
-        //Get all people and put it in the list
+        //Get all people and store old value tha we will use for comparision after update
+        Response getOldPeople = people.getPeople(uri, sessionToken);
+
+        PersonResponse[] getOldPeopleArray = gson
+                .fromJson(getOldPeople.asString(), PersonResponse[].class);
+
+        ArrayList<PersonResponse> oldPeopleArrayList = new ArrayList<>(
+                Arrays.asList(getOldPeopleArray));
+
+        //Get all people and put it in the list that will be converted
         Response getPeopleResponse = people.getPeople(uri, sessionToken);
 
         PersonResponse[] getPeopleArray = gson
@@ -132,18 +138,27 @@ public class RestTest {
         ArrayList<PersonResponse> peopleArrayList = new ArrayList<>(
                 Arrays.asList(getPeopleArray));
 
-        //Swap first and last name
+        //Swap first and last name as string
         ArrayList<String> convertedFullNames = HelperRest
                 .convertListOfNames(peopleArrayList);
 
-        //Set converted names to all people
+        //Set converted names to all people arrayList
         for (int i = 0; i < convertedFullNames.size(); i++) {
             peopleArrayList.get(i).setPeopleName(convertedFullNames.get(i));
 
         }
 
-        //Send update to all
+        //Send update to all and assert that conversion is done
         for (int i = 0; i < peopleArrayList.size(); i++) {
+            //Take old first and last name
+            String fullNameBeforeConversion = oldPeopleArrayList.get(i)
+                    .getPeopleName();
+            String firstNameBeforeConversion = fullNameBeforeConversion
+                    .substring(0, fullNameBeforeConversion.indexOf(" "));
+            String lastNameBeforeConversion = fullNameBeforeConversion
+                    .substring(fullNameBeforeConversion.indexOf(" "));
+
+            //Update person
             UpdatePerson updatePersonBody = new UpdatePerson();
             updatePersonBody
                     .setPeopleName(peopleArrayList.get(i).getPeopleName());
@@ -154,40 +169,34 @@ public class RestTest {
                     .add(peopleArrayList.get(i).getTechnologies().get(0)
                             .getTechnologyId());
 
-            people.updatePerson(updatePersonBody, uri, sessionToken,
-                    peopleArrayList.get(i).getPeopleId().toString());
+            Response update = people
+                    .updatePerson(updatePersonBody, uri, sessionToken,
+                            peopleArrayList.get(i).getPeopleId().toString());
+
+            //Check that first and last name are converted
+            PersonResponse personAfterConversionObj = gson
+                    .fromJson(update.asString(), PersonResponse.class);
+
+            String fullNameAfterConversion = personAfterConversionObj
+                    .getPeopleName();
+            String firstNameAfterConversion = fullNameAfterConversion
+                    .substring(0, fullNameAfterConversion.indexOf(" "));
+            String lastNameAfterConversion = fullNameAfterConversion
+                    .substring(fullNameAfterConversion.indexOf(" "));
+
+            assertThat("First element in string is now second:",
+                    firstNameBeforeConversion.trim(),
+                    is(lastNameAfterConversion.trim()));
+            assertThat("Second element in string is now first:",
+                    lastNameBeforeConversion.trim(),
+                    is(firstNameAfterConversion.trim()));
 
         }
-
-        //Check switching first an last name for the same person that we created at the beginning of test
-        Response personAfterConversionResponse = people
-                .getPersonDetails(uri, sessionToken,
-                        personBeforeConversion.getPeopleId().toString());
-
-        PersonResponse personAfterConversionObj = gson
-                .fromJson(personAfterConversionResponse.asString(),
-                        PersonResponse.class);
-
-        //Extract updated last name and first name
-        String fullNameAfterConversion = personAfterConversionObj
-                .getPeopleName();
-        String firstNameAfterConversion = fullNameAfterConversion
-                .substring(0, fullNameAfterConversion.indexOf(" "));
-        String lastNameAfterConversion = fullNameAfterConversion
-                .substring(fullNameAfterConversion.indexOf(" "));
-
-        //Check that first name and last name are switched
-        assertThat("First element in string is now second:",
-                firstNameBeforeConversion.trim(),
-                is(lastNameAfterConversion.trim()));
-        assertThat("Second element in string is now first:",
-                lastNameBeforeConversion.trim(),
-                is(firstNameAfterConversion.trim()));
-
     }
 
     /**
      * Check will test deletion of all users
+     *
      * @author: dino
      */
     @Test public void deleteAllTest() {
