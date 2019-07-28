@@ -1,0 +1,19 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="TestAll" thread-count="2" verbose="1" parallel="tests">
+
+    <test name="all">
+        <!--<groups>-->
+            <!--<run>-->
+                <!--<exclude name="brokenTests" />-->
+                <!--<include name="db" />-->
+            <!--</run>-->
+        <!--</groups>-->
+
+        <classes>
+            <class name="rest.RestTest" />
+            <class name="ui.UiTest" />
+        </classes>
+    </test>
+
+</suite>
