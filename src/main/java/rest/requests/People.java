@@ -71,4 +71,18 @@ public class People {
         return HelperRest.sendDeleteRequest(rspec);
     }
 
+    public Response getPersonDetails(String uri, String sessionToken, String personId){
+               //Prepare request
+        RequestSpecBuilder builder = new RequestSpecBuilder();
+        builder.setBaseUri(uri);
+        builder.setBasePath("/api/people/person/" + personId);
+        builder.setContentType("application/json");
+
+        builder.addHeader("Authorization", "Bearer " + sessionToken);
+
+        RequestSpecification rspec = builder.build();
+
+        return HelperRest.sendGetReguest(rspec);
+    }
+
 }

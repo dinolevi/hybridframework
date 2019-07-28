@@ -2,12 +2,6 @@ package rest;
 
 import com.google.gson.Gson;
 import io.restassured.response.Response;
-
-import static org.hamcrest.MatcherAssert.*;
-
-import javafx.scene.layout.Priority;
-import org.hamcrest.Matchers;
-import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import rest.body.CreatePersonBody;
@@ -20,8 +14,12 @@ import rest.response.PersonResponse;
 import rest.response.SeniorityResponse;
 import rest.response.TechnologyResponse;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Random;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 public class RestTest {
@@ -40,7 +38,7 @@ public class RestTest {
         sessionToken = HelperRest.sessionToken;
     }
 
-    @Test(priority = 1) public void CreatePerson() {
+    @Test public void createPersonTest() {
         //Create random seniority
         LinkedHashMap<String, String> randomSeniority = new LinkedHashMap<String, String>();
         randomSeniority
@@ -90,7 +88,7 @@ public class RestTest {
                 createPersonObj.getPeopleName(),
                 is(personBody.getPeopleName()));
 
-        assertThat("Person sniority id is the same as " + createSeniorityObj
+        assertThat("Person seniority id is the same as " + createSeniorityObj
                         .getSeniorityTitle(),
                 createPersonObj.getSeniority().getSeniorityId(),
                 is(createSeniorityObj.getSeniorityId()));
@@ -102,7 +100,17 @@ public class RestTest {
 
     }
 
-    @Test(priority = 2) public void firstLastNameConversion() {
+    @Test public void firstLastNameConversionTest() {
+        //Create user that we will check if last name and first name are switched
+        PersonResponse personBeforeConversion = HelperRest
+                .createCompleteRandomPerson();
+        String fullNameBeforeConversion = personBeforeConversion
+                .getPeopleName();
+        String firstNameBeforeConversion = fullNameBeforeConversion
+                .substring(0, fullNameBeforeConversion.indexOf(" "));
+        String lastNameBeforeConversion = fullNameBeforeConversion
+                .substring(fullNameBeforeConversion.indexOf(" "));
+
         //Get all people and put it in the list
         Response getPeopleResponse = people.getPeople(uri, sessionToken);
 
@@ -112,17 +120,11 @@ public class RestTest {
         ArrayList<PersonResponse> peopleArrayList = new ArrayList<>(
                 Arrays.asList(getPeopleArray));
 
-        for (PersonResponse person : peopleArrayList){
-            System.out.println("\nBEFORE CONVERTION"+ person.getPeopleName());
-        }
 
         //Swap first and last name
         ArrayList<String> convertedFullNames = HelperRest
                 .converteListOfNames(peopleArrayList);
 
-        for(int i = 0; i<convertedFullNames.size(); i++){
-            System.out.println("\nAFTER CONVERSION" + convertedFullNames.get(i));
-        }
 
         //Set converted names to all people
         for (int i = 0; i < convertedFullNames.size(); i++) {
@@ -147,46 +149,56 @@ public class RestTest {
                             peopleArrayList.get(i).getPeopleId().toString());
 
         }
+
+        //Check switching first an last name for the same person that we created at the beining of test
+        Response personAfterConversionResponse = people
+                .getPersonDetails(uri, sessionToken,
+                        personBeforeConversion.getPeopleId().toString());
+        PersonResponse personAfterConversionObj = gson
+                .fromJson(personAfterConversionResponse.asString(),
+                        PersonResponse.class);
+        String fullNameAfterConversion = personAfterConversionObj
+                .getPeopleName();
+        String firstNameAfterConversion = fullNameAfterConversion
+                .substring(0, fullNameAfterConversion.indexOf(" "));
+        String lastNameAfterConversion = fullNameAfterConversion
+                .substring(fullNameAfterConversion.indexOf(" "));
+
+        assertThat("First element in string is now second:",
+                firstNameBeforeConversion.trim(),
+                is(lastNameAfterConversion.trim()));
+        assertThat("Second element in string is now first:",
+                lastNameBeforeConversion.trim(),
+                is(firstNameAfterConversion.trim()));
+
     }
 
-//    @Test(priority = 3) public void deleteAll() {
-//        Response getPeopleResponse = people.getPeople(uri, sessionToken);
-//
-//        PersonResponse[] getPeopleArray = gson
-//                .fromJson(getPeopleResponse.asString(), PersonResponse[].class);
-//        ArrayList<PersonResponse> peopleArrayList = new ArrayList<>(
-//                Arrays.asList(getPeopleArray));
-//        ArrayList<Integer> getAllPersonIds = new ArrayList<>();
-//
-//        for (PersonResponse person : peopleArrayList) {
-//            getAllPersonIds.add(person.getPeopleId());
-//        }
-//
-//        for (int i = 0; i <= getAllPersonIds.size() - 1; i++) {
-//            Response response = people.deletePeople(uri, sessionToken,
-//                    getAllPersonIds.get(i).toString());
-//        }
-//
-//        String emptyPeopleResponse = people.getPeople(uri, sessionToken).body()
-//                .asString();
-//        assertThat("There is no users ", emptyPeopleResponse, is("{}"));
-//
-//    }
+    @Test public void deleteAllTest() {
+        //Create at least one user
+        HelperRest.createCompleteRandomPerson();
 
-    @Test public void converterTest() {
-        ArrayList<String> list = new ArrayList<>();
-        list.add("RAMBO MAMBO");
-        list.add("CAKA NOSRIS");
-        list.add("PERA ZDERA");
+        //Get all users
+        Response getPeopleResponse = people.getPeople(uri, sessionToken);
 
-        ArrayList<String> converted = new ArrayList<>();
-        for (int i = 0; i < list.size(); i++) {
-            converted.add(HelperRest.convertName(list.get(i)));
+        PersonResponse[] getPeopleArray = gson
+                .fromJson(getPeopleResponse.asString(), PersonResponse[].class);
+        ArrayList<PersonResponse> peopleArrayList = new ArrayList<>(
+                Arrays.asList(getPeopleArray));
+        ArrayList<Integer> getAllPersonIds = new ArrayList<>();
+
+        for (PersonResponse person : peopleArrayList) {
+            getAllPersonIds.add(person.getPeopleId());
         }
 
-        for (String i : converted){
-            System.out.println(i);
+        for (int i = 0; i <= getAllPersonIds.size() - 1; i++) {
+            Response response = people.deletePeople(uri, sessionToken,
+                    getAllPersonIds.get(i).toString());
         }
+
+        String emptyPeopleResponse = people.getPeople(uri, sessionToken).body()
+                .asString();
+        assertThat("There is no users ", emptyPeopleResponse, is("{}"));
+
     }
 
 }
