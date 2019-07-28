@@ -116,9 +116,8 @@ public class RestTest {
      * @author: dino
      */
     @Test public void firstLastNameConversionTest() {
-        //Create user that we will check if last name and first name are switched
-        PersonResponse personBeforeConversion = HelperRest
-                .createCompleteRandomPerson();
+        //We must have at least one user in case that delete user test is run before
+        HelperRest.createCompleteRandomPerson();
 
         //Get all people and store old value tha we will use for comparision after update
         Response getOldPeople = people.getPeople(uri, sessionToken);

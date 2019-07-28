@@ -146,7 +146,7 @@ public class HelperRest {
         ArrayList<String> convertedList = new ArrayList<>();
         for (int i = 0; i < listFullName.size(); i++) {
 
-            convertedList.add(HelperRest.reverseName(listFullName.get(i)));
+            convertedList.add(HelperRest.switchName(listFullName.get(i)));
 
         }
 
@@ -260,6 +260,14 @@ public class HelperRest {
 
         return createPersonObj;
 
+    }
+
+    public static String switchName(String name){
+        String firstName = name
+                .substring(0, name.indexOf(" "));
+        String lastName = name
+                .substring(name.indexOf(" "));
+        return lastName.trim()+ " " + firstName.trim();
     }
 
 }
