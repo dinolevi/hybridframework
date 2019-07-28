@@ -22,6 +22,10 @@ import java.util.Random;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
+/**
+ * In this class will be tested creation, update and deletion of users, via rest assured
+ * @author: dino
+ */
 public class RestTest {
 
     private String uri = "https://qa-sandbox.apps.htec.rs";
@@ -38,6 +42,10 @@ public class RestTest {
         sessionToken = HelperRest.sessionToken;
     }
 
+    /**
+     * Test will check creation of random seniority, technology and person
+     * @author: dino
+     */
     @Test public void createPersonTest() {
         //Create random seniority
         LinkedHashMap<String, String> randomSeniority = new LinkedHashMap<String, String>();
@@ -78,10 +86,10 @@ public class RestTest {
         technologyList.add(createTechnologyObj.getTechnologyId().intValue());
         personBody.setTechnologies(technologyList);
 
-        Response crestePersonResponse = people
+        Response createPersonResponse = people
                 .createPerson(personBody, uri, sessionToken);
         PersonResponse createPersonObj = gson
-                .fromJson(crestePersonResponse.asString(),
+                .fromJson(createPersonResponse.asString(),
                         PersonResponse.class);
 
         assertThat("Person name is the same as we pass in request",
@@ -100,6 +108,10 @@ public class RestTest {
 
     }
 
+    /**
+     * Test will check update functionality of person and it will swap first and last name of all users
+     * @author: dino
+     */
     @Test public void firstLastNameConversionTest() {
         //Create user that we will check if last name and first name are switched
         PersonResponse personBeforeConversion = HelperRest
@@ -120,11 +132,9 @@ public class RestTest {
         ArrayList<PersonResponse> peopleArrayList = new ArrayList<>(
                 Arrays.asList(getPeopleArray));
 
-
         //Swap first and last name
         ArrayList<String> convertedFullNames = HelperRest
-                .converteListOfNames(peopleArrayList);
-
+                .convertListOfNames(peopleArrayList);
 
         //Set converted names to all people
         for (int i = 0; i < convertedFullNames.size(); i++) {
@@ -144,19 +154,21 @@ public class RestTest {
                     .add(peopleArrayList.get(i).getTechnologies().get(0)
                             .getTechnologyId());
 
-            Response update = people
-                    .updatePerson(updatePersonBody, uri, sessionToken,
-                            peopleArrayList.get(i).getPeopleId().toString());
+            people.updatePerson(updatePersonBody, uri, sessionToken,
+                    peopleArrayList.get(i).getPeopleId().toString());
 
         }
 
-        //Check switching first an last name for the same person that we created at the beining of test
+        //Check switching first an last name for the same person that we created at the beginning of test
         Response personAfterConversionResponse = people
                 .getPersonDetails(uri, sessionToken,
                         personBeforeConversion.getPeopleId().toString());
+
         PersonResponse personAfterConversionObj = gson
                 .fromJson(personAfterConversionResponse.asString(),
                         PersonResponse.class);
+
+        //Extract updated last name and first name
         String fullNameAfterConversion = personAfterConversionObj
                 .getPeopleName();
         String firstNameAfterConversion = fullNameAfterConversion
@@ -164,6 +176,7 @@ public class RestTest {
         String lastNameAfterConversion = fullNameAfterConversion
                 .substring(fullNameAfterConversion.indexOf(" "));
 
+        //Check that first name and last name are switched
         assertThat("First element in string is now second:",
                 firstNameBeforeConversion.trim(),
                 is(lastNameAfterConversion.trim()));
@@ -173,6 +186,10 @@ public class RestTest {
 
     }
 
+    /**
+     * Check will test deletion of all users
+     * @author: dino
+     */
     @Test public void deleteAllTest() {
         //Create at least one user
         HelperRest.createCompleteRandomPerson();

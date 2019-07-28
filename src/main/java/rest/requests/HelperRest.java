@@ -19,11 +19,26 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
+/**
+ * Class provide helpers for rest testing suche as getToken, createRandomPerson,
+ * send get, post, put, delete requests
+ *
+ * @author: dino
+ */
 public class HelperRest {
 
     public static String sessionToken;
     public static String refreshToken;
 
+    /**
+     * Method will generate session and refresh tokens and store it to sessionToken
+     * and refreshToken attributes when all parameters are inserted
+     *
+     * @param uri              base url
+     * @param operatorUsername operator user name
+     * @param operatorPassword operator password
+     * @author: dino
+     */
     public static void getTokens(String uri, String operatorUsername,
             String operatorPassword) {
         //Prepare body and convert to json
@@ -56,44 +71,70 @@ public class HelperRest {
 
     }
 
+    /**
+     * Generic method for sending Post request when request specification object
+     * is inserted as parameter
+     *
+     * @param rspec request specification object
+     * @return response which can be used for assertation
+     * @author: dino
+     */
     public static Response sendPostRequest(RequestSpecification rspec) {
         return given().spec(rspec).log().all().relaxedHTTPSValidation().when()
                 .post().then().log().all().extract().response();
     }
 
+    /**
+     * Generic method for sending Get request when request specification object
+     * is inserted as parameter
+     *
+     * @param rspec request specification object
+     * @return response which can be used for assertation
+     * @author: dino
+     */
     public static Response sendGetReguest(RequestSpecification rspec) {
         return given().spec(rspec).log().all().relaxedHTTPSValidation().when()
                 .get().then().log().all().extract().response();
     }
 
+    /**
+     * Generic method for sending Put request when request specification object
+     * is inserted as parameter
+     *
+     * @param rspec request specification object
+     * @return response which can be used for assertation
+     * @author: dino
+     */
     public static Response sendPut(RequestSpecification rspec) {
         return given().spec(rspec).log().all().relaxedHTTPSValidation().when()
                 .put().then().log().all().extract().response();
     }
 
+    /**
+     * Generic method for sending Delete request when request specification object
+     * is inserted as parameter
+     *
+     * @param rspec request specification object
+     * @return response which can be used for assertation
+     * @author: dino
+     */
     public static Response sendDeleteRequest(RequestSpecification rspec) {
         return given().spec(rspec).log().all().relaxedHTTPSValidation().when()
                 .delete().then().log().all().extract().response();
     }
 
-    //    public static String convertName(String name) {
-    //        String firstName = name.substring(0, name.indexOf(" "));
-    //        String lastName = name.substring(name.indexOf(" "));
-    //        String cName = lastName + " " + firstName;
-    //        return cName;
-    //    }
-
-    public static String convertName(String name) {
-        String[] words = name.split(" ");
-        String first = words[0];
-        String lastName = words[1];
-        String cName = lastName + " " + first;
-        return cName;
-    }
-
-    public static ArrayList<String> converteListOfNames(
+    /**
+     * Helper function for going through list of all names and switching first and
+     * last name position
+     *
+     * @param peopleArrayList arraylist of people which we want to switch first and last name
+     * @return converted list of names as String
+     * @author: dino
+     */
+    public static ArrayList<String> convertListOfNames(
             ArrayList<PersonResponse> peopleArrayList) {
 
+        //Extract full name from People array list
         ArrayList<String> listFullName = new ArrayList<>();
 
         for (int i = 0; i < peopleArrayList.size(); i++) {
@@ -101,6 +142,7 @@ public class HelperRest {
             listFullName.add(peopleArrayList.get(i).getPeopleName());
         }
 
+        //For loop for switching first and last name
         ArrayList<String> convertedList = new ArrayList<>();
         for (int i = 0; i < listFullName.size(); i++) {
 
@@ -111,6 +153,12 @@ public class HelperRest {
         return convertedList;
     }
 
+    /**
+     * Method will switch places of first and last name if they are inserted as one string
+     *
+     * @param name full name of person
+     * @return string with first and last name switched position
+     */
     public static String reverseName(String name) {
 
         name = name.trim();
@@ -137,11 +185,17 @@ public class HelperRest {
 
     }
 
+    /**
+     * Method will create random person with added random seniority and technology
+
+     * @return random created person
+     * @author: dino
+     */
     public static PersonResponse createCompleteRandomPerson() {
 
         String uri = "https://qa-sandbox.apps.htec.rs";
         String sessionToken = HelperRest.sessionToken;
-                Seniorities senioritiesRequests = new Seniorities();
+        Seniorities senioritiesRequests = new Seniorities();
         Gson gson = new Gson();
         Technologies technologiesRequests = new Technologies();
         People people = new People();

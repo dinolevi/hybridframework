@@ -7,9 +7,24 @@ import io.restassured.specification.RequestSpecification;
 import rest.body.CreatePersonBody;
 import rest.body.UpdatePerson;
 
+/**
+ * Class contains requests for contacting People API
+ *
+ * @author dino
+ */
 public class People {
 
-    public Response createPerson(CreatePersonBody personBody, String uri, String sessionToken){
+    /**
+     * Request will send request for creating person when all parameters are inserted
+     *
+     * @param personBody   prepared body of requests
+     * @param uri          base url
+     * @param sessionToken session token
+     * @return return response which can be used for assertions
+     * @author: dino
+     */
+    public Response createPerson(CreatePersonBody personBody, String uri,
+            String sessionToken) {
         Gson gson = new Gson();
         String jsonBody = gson.toJson(personBody);
 
@@ -26,7 +41,15 @@ public class People {
         return HelperRest.sendPostRequest(rspec);
     }
 
-    public Response getPeople(String uri, String sessionToken){
+    /**
+     * Request which will return details for all people
+     *
+     * @param uri          base url
+     * @param sessionToken session token
+     * @return return details for all users
+     * @author: dino
+     */
+    public Response getPeople(String uri, String sessionToken) {
         //Prepare request
         RequestSpecBuilder builder = new RequestSpecBuilder();
         builder.setBaseUri(uri);
@@ -40,14 +63,25 @@ public class People {
         return HelperRest.sendGetReguest(rspec);
     }
 
-    public Response updatePerson(UpdatePerson updatePerson,String uri, String sessionToken, String personId){
+    /**
+     * Request which will update person when all parameters are inserted
+     *
+     * @param updatePerson body
+     * @param uri          base url
+     * @param sessionToken session token
+     * @param personId     person id
+     * @return response after updated which can be used for assertions
+     * @author: dino
+     */
+    public Response updatePerson(UpdatePerson updatePerson, String uri,
+            String sessionToken, String personId) {
         Gson gson = new Gson();
         String jsonBody = gson.toJson(updatePerson);
 
         //Prepare request
         RequestSpecBuilder builder = new RequestSpecBuilder();
         builder.setBaseUri(uri);
-        builder.setBasePath(" /api/people/person/"+personId);
+        builder.setBasePath(" /api/people/person/" + personId);
         builder.setContentType("application/json");
         builder.setBody(jsonBody);
         builder.addHeader("Authorization", "Bearer " + sessionToken);
@@ -57,11 +91,21 @@ public class People {
         return HelperRest.sendPut(rspec);
     }
 
-    public Response deletePeople(String uri, String sessionToken, String personId){
+    /**
+     * Request which will delete person when all parameters are inserted
+     *
+     * @param uri          base url
+     * @param sessionToken session token
+     * @param personId     personId
+     * @return response for successful deletion of user
+     * @author: dino
+     */
+    public Response deletePeople(String uri, String sessionToken,
+            String personId) {
         //Prepare request
         RequestSpecBuilder builder = new RequestSpecBuilder();
         builder.setBaseUri(uri);
-        builder.setBasePath("/api/people/person/"+personId);
+        builder.setBasePath("/api/people/person/" + personId);
         builder.setContentType("application/json");
         builder.addHeader("Authorization", "Bearer " + sessionToken);
 
@@ -71,8 +115,17 @@ public class People {
         return HelperRest.sendDeleteRequest(rspec);
     }
 
-    public Response getPersonDetails(String uri, String sessionToken, String personId){
-               //Prepare request
+    /**
+     * Request which will return details for specific person
+     *
+     * @param uri          base url
+     * @param sessionToken session token
+     * @return return details for specific person
+     * @author: dino
+     */
+    public Response getPersonDetails(String uri, String sessionToken,
+            String personId) {
+        //Prepare request
         RequestSpecBuilder builder = new RequestSpecBuilder();
         builder.setBaseUri(uri);
         builder.setBasePath("/api/people/person/" + personId);
