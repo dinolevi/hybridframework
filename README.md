@@ -14,6 +14,8 @@ test case just as a proof concept). GUI test cases can be run on chrome or firef
 Machine on which framework is made:
 * Windows10 64bit
 * InteliJ IDEA
+* java version: 8
+* maven versoin: 3.6.0
 
 Project is created with libraries:
 * testng version: 6.14.3
