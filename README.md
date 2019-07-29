@@ -9,6 +9,8 @@ All required test tasks (create user, update all user, delete user) are stored i
 RestTest class(package: test/java/rest). Also I have spare time to setup basis for
 GUI auto tests. GUI tests are stored in test/java/ui package (there is only one login
 test case just as a proof concept). GUI test cases can be run on chrome or firefox.
+Pleasse update your credentials if it is necessery in main/java/resources/properties.yml 
+file to obtain valid session token.
 
 ## Technologies
 Machine on which framework is made:
