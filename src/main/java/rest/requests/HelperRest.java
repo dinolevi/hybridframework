@@ -154,38 +154,6 @@ public class HelperRest {
     }
 
     /**
-     * Method will switch places of first and last name if they are inserted as one string
-     *
-     * @param name full name of person
-     * @return string with first and last name switched position
-     */
-    public static String reverseName(String name) {
-
-        name = name.trim();
-
-        StringBuilder reversedNameBuilder = new StringBuilder();
-        StringBuilder subNameBuilder = new StringBuilder();
-
-        for (int i = 0; i < name.length(); i++) {
-
-            char currentChar = name.charAt(i);
-
-            if (currentChar != ' ') {
-                subNameBuilder.append(currentChar);
-            } else {
-                reversedNameBuilder
-                        .insert(0, currentChar + subNameBuilder.toString());
-                subNameBuilder.setLength(0);
-            }
-
-        }
-
-        return reversedNameBuilder.insert(0, subNameBuilder.toString())
-                .toString();
-
-    }
-
-    /**
      * Method will create random person with added random seniority and technology
 
      * @return random created person
@@ -262,6 +230,12 @@ public class HelperRest {
 
     }
 
+    /**
+     * Method will switch places of first and last name if they are inserted as one string
+     *
+     * @param name full name of person
+     * @return string with first and last name switched position
+     */
     public static String switchName(String name){
         String firstName = name
                 .substring(0, name.indexOf(" "));
