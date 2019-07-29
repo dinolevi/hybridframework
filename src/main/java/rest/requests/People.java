@@ -1,6 +1,7 @@
 package rest.requests;
 
 import com.google.gson.Gson;
+import helpers.YamlReader;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
@@ -31,7 +32,7 @@ public class People {
         //Prepare request
         RequestSpecBuilder builder = new RequestSpecBuilder();
         builder.setBaseUri(uri);
-        builder.setBasePath("/api/people/person");
+        builder.setBasePath(YamlReader.getProperties().getPeopleApi().getCreatePerson());
         builder.setContentType("application/json");
         builder.setBody(jsonBody);
         builder.addHeader("Authorization", "Bearer " + sessionToken);
@@ -53,7 +54,7 @@ public class People {
         //Prepare request
         RequestSpecBuilder builder = new RequestSpecBuilder();
         builder.setBaseUri(uri);
-        builder.setBasePath("/api/people/all");
+        builder.setBasePath(YamlReader.getProperties().getPeopleApi().getGetPeople());
         builder.setContentType("application/json");
         builder.addHeader("Authorization", "Bearer " + sessionToken);
 
@@ -81,7 +82,7 @@ public class People {
         //Prepare request
         RequestSpecBuilder builder = new RequestSpecBuilder();
         builder.setBaseUri(uri);
-        builder.setBasePath(" /api/people/person/" + personId);
+        builder.setBasePath(YamlReader.getProperties().getPeopleApi().getUpdatePerson() + personId);
         builder.setContentType("application/json");
         builder.setBody(jsonBody);
         builder.addHeader("Authorization", "Bearer " + sessionToken);
@@ -105,7 +106,7 @@ public class People {
         //Prepare request
         RequestSpecBuilder builder = new RequestSpecBuilder();
         builder.setBaseUri(uri);
-        builder.setBasePath("/api/people/person/" + personId);
+        builder.setBasePath(YamlReader.getProperties().getPeopleApi().getDeletePeople() + personId);
         builder.setContentType("application/json");
         builder.addHeader("Authorization", "Bearer " + sessionToken);
 
@@ -128,7 +129,7 @@ public class People {
         //Prepare request
         RequestSpecBuilder builder = new RequestSpecBuilder();
         builder.setBaseUri(uri);
-        builder.setBasePath("/api/people/person/" + personId);
+        builder.setBasePath(YamlReader.getProperties().getPeopleApi().getGetPersonDetails() + personId);
         builder.setContentType("application/json");
 
         builder.addHeader("Authorization", "Bearer " + sessionToken);

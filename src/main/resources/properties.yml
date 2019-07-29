@@ -1,0 +1,15 @@
+---
+baseURL: https://qa-sandbox.apps.htec.rs
+userName: dinorac87@gmail.com
+password: Test1234!
+seniorityApi:
+  createSeniority: /api/seniorities/seniority
+techonolgyApi:
+  createTechnology: /api/technologies/technology
+peopleApi:
+  createPerson: /api/people/person
+  getPeople: /api/people/all
+  updatePerson: /api/people/person/
+  deletePeople:  /api/people/person/
+  getPersonDetails: /api/people/person/
+
