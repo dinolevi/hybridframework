@@ -146,43 +146,11 @@ public class HelperRest {
         ArrayList<String> convertedList = new ArrayList<>();
         for (int i = 0; i < listFullName.size(); i++) {
 
-            convertedList.add(HelperRest.reverseName(listFullName.get(i)));
+            convertedList.add(HelperRest.switchName(listFullName.get(i)));
 
         }
 
         return convertedList;
-    }
-
-    /**
-     * Method will switch places of first and last name if they are inserted as one string
-     *
-     * @param name full name of person
-     * @return string with first and last name switched position
-     */
-    public static String reverseName(String name) {
-
-        name = name.trim();
-
-        StringBuilder reversedNameBuilder = new StringBuilder();
-        StringBuilder subNameBuilder = new StringBuilder();
-
-        for (int i = 0; i < name.length(); i++) {
-
-            char currentChar = name.charAt(i);
-
-            if (currentChar != ' ') {
-                subNameBuilder.append(currentChar);
-            } else {
-                reversedNameBuilder
-                        .insert(0, currentChar + subNameBuilder.toString());
-                subNameBuilder.setLength(0);
-            }
-
-        }
-
-        return reversedNameBuilder.insert(0, subNameBuilder.toString())
-                .toString();
-
     }
 
     /**
@@ -260,6 +228,20 @@ public class HelperRest {
 
         return createPersonObj;
 
+    }
+
+    /**
+     * Method will switch places of first and last name if they are inserted as one string
+     *
+     * @param name full name of person
+     * @return string with first and last name switched position
+     */
+    public static String switchName(String name){
+        String firstName = name
+                .substring(0, name.indexOf(" "));
+        String lastName = name
+                .substring(name.indexOf(" "));
+        return lastName.trim()+ " " + firstName.trim();
     }
 
 }

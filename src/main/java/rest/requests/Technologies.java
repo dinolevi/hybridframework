@@ -1,6 +1,7 @@
 package rest.requests;
 
 import com.google.gson.Gson;
+import helpers.YamlReader;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
@@ -31,7 +32,7 @@ public class Technologies {
         //Prepare request
         RequestSpecBuilder builder = new RequestSpecBuilder();
         builder.setBaseUri(uri);
-        builder.setBasePath("/api/technologies/technology");
+        builder.setBasePath(YamlReader.getProperties().getTechonolgyApi().getCreateTechnology());
         builder.setContentType("application/json");
         builder.setBody(jsonBody);
         builder.addHeader("Authorization", "Bearer " + sessionToken);

@@ -1,6 +1,7 @@
 package rest.requests;
 
 import com.google.gson.Gson;
+import helpers.YamlReader;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
@@ -31,7 +32,7 @@ public class Seniorities {
         //Prepare request
         RequestSpecBuilder builder = new RequestSpecBuilder();
         builder.setBaseUri(uri);
-        builder.setBasePath("/api/seniorities/seniority");
+        builder.setBasePath(YamlReader.getProperties().getSeniorityApi().getCreateSeniority());
         builder.setContentType("application/json");
         builder.setBody(jsonBody);
         builder.addHeader("Authorization", "Bearer " + sessionToken);

@@ -1,5 +1,6 @@
 package ui;
 
+import helpers.YamlReader;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -21,10 +22,10 @@ public class BaseUiTest {
     public static final String CHROME_DRIVER = "chrome";
     public static final String FIREFOX_DRIVER = "firefox";
     public WebDriver driver;
-    public String url = "https://qa-sandbox.apps.htec.rs/";
+    public String url = YamlReader.getProperties().getBaseURL();
     public LoginPage loginPage;
-    public String operatorUsername = "dinorac87@gmail.com";
-    public String operatorPassword = "Test1234!";
+    public String operatorUsername = YamlReader.getProperties().getUserName();
+    public String operatorPassword = YamlReader.getProperties().getPassword();
     public UiHelpers helper;
 
     /**
@@ -41,7 +42,7 @@ public class BaseUiTest {
         //Success login
         driver.get(url);
         driver.manage().timeouts().implicitlyWait(2, SECONDS);
-        assertThat("We reached homePage", driver.getCurrentUrl(), is(url));
+        assertThat("We reached homePage", driver.getCurrentUrl(), is(url+"/"));
         assertThat("Title is", driver.getTitle(), is("Sandbox"));
         assertThat("Header is ", loginPage.getHomePageHeader(),
                 is("QA Sandbox"));

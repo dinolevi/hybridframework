@@ -1,6 +1,7 @@
 package rest;
 
 import com.google.gson.Gson;
+import helpers.YamlReader;
 import io.restassured.response.Response;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -29,9 +30,9 @@ import static org.hamcrest.core.Is.is;
  */
 public class RestTest {
 
-    private String uri = "https://qa-sandbox.apps.htec.rs";
-    private String operatorUsername = "dinorac87@gmail.com";
-    private String operatorPassword = "Test1234!";
+    private String uri = YamlReader.getProperties().getBaseURL();
+    private String operatorUsername = YamlReader.getProperties().getUserName();
+    private String operatorPassword = YamlReader.getProperties().getPassword();
     private String sessionToken;
     private Seniorities senioritiesRequests = new Seniorities();
     private Gson gson = new Gson();
@@ -116,9 +117,8 @@ public class RestTest {
      * @author: dino
      */
     @Test public void firstLastNameConversionTest() {
-        //Create user that we will check if last name and first name are switched
-        PersonResponse personBeforeConversion = HelperRest
-                .createCompleteRandomPerson();
+        //We must have at least one user in case that delete user test is run before
+        HelperRest.createCompleteRandomPerson();
 
         //Get all people and store old value tha we will use for comparision after update
         Response getOldPeople = people.getPeople(uri, sessionToken);
