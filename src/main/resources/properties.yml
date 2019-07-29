@@ -1,6 +1,6 @@
 ---
 baseURL: https://qa-sandbox.apps.htec.rs
-userName: dinorac87@gmail.com
+userName: youknowmyamail@mail.com
 password: Test1234!
 seniorityApi:
   createSeniority: /api/seniorities/seniority
